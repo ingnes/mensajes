@@ -50,7 +50,7 @@
     </table>
 
 @else
-    <table>
+    <table style="width:100%; border:1px solid">
         <tbody>
             <tr> No hay mensajes cargados </tr>
         </tbody>
