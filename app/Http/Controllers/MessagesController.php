@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Message;
 use Carbon\Carbon;
+use App\Exports\MessagesExport;
+use App\Exports\MessagesImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MessagesController extends Controller
 {
@@ -97,9 +100,22 @@ class MessagesController extends Controller
 
         return redirect()->route('mensajes.index');
     }
-
+    
     public function export() {
-        
+        return Excel::download(New MessagesExport,'mensajes.xlsx');
+    }
 
+    public function import(Request $request) 
+    {
+        // Validar que se ha subido un archivo
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv'
+        ]);
+
+        // Importar el archivo utilizando la clase UsersImport
+        Excel::import(new UsersImport, $request->file('file'));
+
+        // Redirigir con un mensaje de éxito
+        return redirect('/')->with('success', 'Datos importados con éxito!');
     }
 }

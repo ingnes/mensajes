@@ -5,12 +5,8 @@
 <h1>Todos los mensajes</h1>
 
 <div>
-    
-    <form action="{{route('mensajes.export')}}" method="post" enctype="multipart/form-data">
-        {!! csrf_field() !!}
-       {{-- <input type="file" name="documento" id="docummento"> --}}
-       <button type="submit">Exportar</button>
-    </form>
+     <a href="{{url('mensajes-exportar')}}">Exportar</a> 
+     <a href="{{url('mensajes-importar')}}">Importar</a>      
 </div>
 
 @if ($mensajes->count())
@@ -57,6 +53,5 @@
     </table>
 
 @endif
-
 
 @endsection

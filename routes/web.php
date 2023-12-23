@@ -23,7 +23,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'App\Http\Controllers\MessagesController@create')->name('home');
 Route::resource('mensajes', MessagesController::class);
 
-Route::get('export', 'App\Http\Controllers\MessagesController@export')->name('mensajes.export');
+Route::get('mensajes-exportar', 'App\Http\Controllers\MessagesController@export')->name('mensajes.export');
+Route::get('mensajes-importar', 'App\Http\Controllers\MessagesController@import')->name('mensajes.import');
 
 
 Route::get('documentacion', 'App\Http\Controllers\PagesController@docu')->name('docu');
