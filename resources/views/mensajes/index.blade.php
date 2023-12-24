@@ -2,12 +2,29 @@
 
 @section('contenido')
 
+@if (Session()->has('success'))
+    <h3> {{ Session('success') }}</h3>
+@endif
+
+@if (Session()->has('errors'))
+    <h3> {{ Session('errors') }}</h3>
+@endif
+
 <h1>Todos los mensajes</h1>
 
 <div>
      <a href="{{url('mensajes-exportar')}}">Exportar</a> 
      <a href="{{url('mensajes-importar')}}">Importar</a>      
 </div>
+
+{{-- <div>
+    <form action="{{url('mensajes-importar')}}" method="post" enctype="multipart/form-data" >
+        {!! csrf_field() !!}
+        <input type="file" name="file">
+        <button type="submit">Importar</button>   
+    </form>
+
+</div> --}}
 
 @if ($mensajes->count())
 

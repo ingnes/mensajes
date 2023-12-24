@@ -25,6 +25,7 @@ Route::resource('mensajes', MessagesController::class);
 
 Route::get('mensajes-exportar', 'App\Http\Controllers\MessagesController@export')->name('mensajes.export');
 Route::get('mensajes-importar', 'App\Http\Controllers\MessagesController@import')->name('mensajes.import');
+Route::post('mensajes-importar', 'App\Http\Controllers\MessagesController@import')->name('mensajes.import');
 
 
 Route::get('documentacion', 'App\Http\Controllers\PagesController@docu')->name('docu');

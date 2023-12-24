@@ -2,10 +2,14 @@
 
 namespace App\Imports;
 
-use App\Models\Message;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Collection;
 
-class MessagesImport implements ToModel
+use App\Models\Message;
+use Maatwebsite\Excel\Concerns\{ToModel, WithHeadingRow,WithValidation,ToCollection};
+use Maatwebsite\Excel\Excel;
+
+class MessagesImport implements ToModel, WithHeadingRow , WithValidation, ToCollection
 {
     /**
     * @param array $row
@@ -13,11 +17,36 @@ class MessagesImport implements ToModel
     * @return \Illuminate\Database\Eloquent\Model|null
     */
     public function model(array $row)
-    {
-        return new Message([
-           'nombre'  => trim($row[0]),
-           'email'   => trim($row[1]),
-           'mensaje' => trim($row[2]),
-        ]);
+    {       
+        // return new Message([
+        //    'nombre'  => trim($row['nombre']),
+        //    'email'   => trim($row['email']),
+        //    'mensaje' => trim($row['mensaje']),
+        // ]);       
     }
+
+    public function collection(Collection $rows)
+    {
+   
+      foreach($rows as $row)
+      { 
+        
+        $mensaje = new Message;
+        $mensaje->nombre = trim($row['nombre']);
+        $mensaje->email   = trim($row['email']);
+        $mensaje->mensaje = trim($row['mensaje']);
+        $mensaje->save();
+       }
+    }
+
+    public function rules(): array
+    {
+         return [
+           'nombre' => 'required|string',
+           'email'  => 'required|email',
+           'mensaje' => 'required|max:250'
+        ];
+    }
+
+   
 }

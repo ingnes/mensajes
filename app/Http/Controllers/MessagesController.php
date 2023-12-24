@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Http\Request;
 use App\Models\Message;
 use Carbon\Carbon;
 use App\Exports\MessagesExport;
-use App\Exports\MessagesImport;
+use App\Imports\MessagesImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MessagesController extends Controller
@@ -20,7 +21,7 @@ class MessagesController extends Controller
 
     public function index()
     {
-       $mensajes = Message::all();      
+       $mensajes = Message::all()->sortBy('nombre');;      
 
        //return view('mensajes.index', compact('mensajes'));
        return view('mensajes.index')->with('mensajes',$mensajes);
@@ -105,17 +106,84 @@ class MessagesController extends Controller
         return Excel::download(New MessagesExport,'mensajes.xlsx');
     }
 
-    public function import(Request $request) 
-    {
-        // Validar que se ha subido un archivo
-        $request->validate([
-            'file' => 'required|mimes:xlsx,csv'
-        ]);
+    public function import() {        
+       
+        $path = "/imports/";
+        $files = Storage::disk('local')->files($path);         
 
-        // Importar el archivo utilizando la clase UsersImport
-        Excel::import(new UsersImport, $request->file('file'));
+        if ($files) {
+            //obtengo todos los archivos en storage/app/imports
+            foreach ($files as $file) :                                 
+                // Importar el archivo utilizando la clase MessagesImport
+                try{
+                    Excel::import(new MessagesImport, $file);  
+                }
+                catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
 
-        // Redirigir con un mensaje de éxito
-        return redirect('/')->with('success', 'Datos importados con éxito!');
+                    // dd($file);
+
+                    $failures = $e->failures();   
+                    // dd($failures);  
+                    foreach ($failures as $failure) {
+                        
+                        $filename = pathinfo($file, PATHINFO_FILENAME);                       
+
+                        $error = [
+                            'archivo' => basename($file),
+                            'fila' => $failure->row(),  // row that went wrong
+                            'columna' => $failure->attribute(), // either heading key (if using heading row concern) or column index
+                            'error' => $failure->errors(), // Actual error messages from Laravel validator
+                            'valores' =>  $failure->values() // The values of the row that has failed.
+                        ];
+
+                        Storage::disk('local')->put('failed/'.$filename.'.txt', json_encode($error));
+                    }
+
+                }
+                         
+
+            endforeach;
+        }        
+
+        // // Redirigir con un mensaje de éxito
+         return redirect()->back()->with('success', 'Datos importados con éxito!');
     }
+
+
+    // public function import(Request $request) {        
+               
+    //     // dd(request()->file('file'));
+        
+    //     if (!request()->file('file')) {
+    //         return redirect()->back()->with('errors' ,'Error en importacion, por favor seleccione archivo a importar');
+    //     }
+
+    //     try{
+
+    //         // Importar el archivo utilizando la clase MessagesImport
+    //         Excel::import(new MessagesImport, request()->file('file'));
+       
+    //     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+
+    //         $failures = $e->failures();     
+    //         foreach ($failures as $failure) {
+    //             $failure->row(); // row that went wrong
+    //             $failure->attribute(); // either heading key (if using heading row concern) or column index
+    //             $failure->errors(); // Actual error messages from Laravel validator
+    //             $failure->values(); // The values of the row that has failed.
+    //         }
+          
+            
+    //     }
+
+    //     catch (\Exception $e) {
+
+
+    //     }                        
+         
+    //            // // Redirigir con un mensaje de éxito
+    //     return redirect()->back()->with('success', 'Datos importados con éxito!');
+    // }
+
+
 }
