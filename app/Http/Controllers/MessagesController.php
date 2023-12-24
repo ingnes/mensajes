@@ -15,7 +15,7 @@ class MessagesController extends Controller
     
     public function __construct() {
 
-        $this->middleware('auth', ['except' => 'create']);
+        $this->middleware('auth', ['except' => ['create','store']]);
     }
 
 
@@ -106,84 +106,105 @@ class MessagesController extends Controller
         return Excel::download(New MessagesExport,'mensajes.xlsx');
     }
 
-    public function import() {        
+    // public function import() {        
        
-        $path = "/imports/";
-        $files = Storage::disk('local')->files($path);         
+    //     $path = "/imports/";
+    //     $files = Storage::disk('local')->files($path);         
 
-        if ($files) {
-            //obtengo todos los archivos en storage/app/imports
-            foreach ($files as $file) :                                 
-                // Importar el archivo utilizando la clase MessagesImport
-                try{
-                    Excel::import(new MessagesImport, $file);  
-                }
-                catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+    //     if ($files) {
+    //         //obtengo todos los archivos en storage/app/imports
+    //         foreach ($files as $file) :                                 
+    //             // Importar el archivo utilizando la clase MessagesImport
+    //             try{
+    //                 Excel::import(new MessagesImport, $file);  
+    //             }
+    //             catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
 
-                    // dd($file);
+    //                 // dd($file);
 
-                    $failures = $e->failures();   
-                    // dd($failures);  
-                    foreach ($failures as $failure) {
+    //                 $failures = $e->failures();   
+    //                 // dd($failures);  
+    //                 foreach ($failures as $failure) {
                         
-                        $filename = pathinfo($file, PATHINFO_FILENAME);                       
+    //                     $filename = pathinfo($file, PATHINFO_FILENAME);                       
 
-                        $error = [
-                            'archivo' => basename($file),
-                            'fila' => $failure->row(),  // row that went wrong
-                            'columna' => $failure->attribute(), // either heading key (if using heading row concern) or column index
-                            'error' => $failure->errors(), // Actual error messages from Laravel validator
-                            'valores' =>  $failure->values() // The values of the row that has failed.
-                        ];
+    //                     $error = [
+    //                         'archivo' => basename($file),
+    //                         'fila' => $failure->row(),  // row that went wrong
+    //                         'columna' => $failure->attribute(), // either heading key (if using heading row concern) or column index
+    //                         'error' => $failure->errors(), // Actual error messages from Laravel validator
+    //                         'valores' =>  $failure->values() // The values of the row that has failed.
+    //                     ];
 
-                        Storage::disk('local')->put('failed/'.$filename.'.txt', json_encode($error));
-                    }
+    //                     Storage::disk('local')->put('failed/'.$filename.'.txt', json_encode($error));
+    //                 }
 
-                }
+    //             }
                          
 
-            endforeach;
-        }        
+    //         endforeach;
+    //     }        
 
-        // // Redirigir con un mensaje de éxito
-         return redirect()->back()->with('success', 'Datos importados con éxito!');
-    }
+    //     // // Redirigir con un mensaje de éxito
+    //      return redirect()->back()->with('success', 'Datos importados con éxito!');
+    // }
 
 
-    // public function import(Request $request) {        
+    public function import(Request $request) {        
                
-    //     // dd(request()->file('file'));
+        // dd(request()->file('file'));
         
-    //     if (!request()->file('file')) {
-    //         return redirect()->back()->with('errors' ,'Error en importacion, por favor seleccione archivo a importar');
-    //     }
+        if (!request()->file('file')) {
+            return redirect()->back()->with('errors' ,'Error en importacion, por favor seleccione archivo a importar');
+        }
 
-    //     try{
+        $tipo = 'success';
+        $mensaje = 'Datos importados con éxito!';
 
-    //         // Importar el archivo utilizando la clase MessagesImport
-    //         Excel::import(new MessagesImport, request()->file('file'));
+
+        try{
+
+            $file = request()->file('file');
+            // dd($file);
+            // Importar el archivo utilizando la clase MessagesImport
+            Excel::import(new MessagesImport, request()->file('file'));
        
-    //     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
 
-    //         $failures = $e->failures();     
-    //         foreach ($failures as $failure) {
-    //             $failure->row(); // row that went wrong
-    //             $failure->attribute(); // either heading key (if using heading row concern) or column index
-    //             $failure->errors(); // Actual error messages from Laravel validator
-    //             $failure->values(); // The values of the row that has failed.
-    //         }
+            $failures = $e->failures();     
+            foreach ($failures as $failure) {
+
+                $originalname = $file->getClientOriginalName();    
+                $filename = pathinfo($originalname, PATHINFO_FILENAME);                       
+
+                    $error = [
+                        'archivo' => $originalname,
+                        'fila' => $failure->row(),  // row that went wrong
+                        'columna' => $failure->attribute(), // either heading key (if using heading row concern) or column index
+                        'error' => $failure->errors(), // Actual error messages from Laravel validator
+                        'valores' =>  $failure->values() // The values of the row that has failed.
+                    ];
+
+                    Storage::disk('local')->put('failed/'.$filename.'.txt', json_encode($error));
+
+                   $tipo = 'errors';
+                   $mensaje = 'Hubo un error en la importacion, chequear el archivo de logs';
+               
+            }
           
             
-    //     }
+        }
 
-    //     catch (\Exception $e) {
-
-
-    //     }                        
+        catch (\Exception $e) {
+                 $originalname = $file->getClientOriginalName();    
+                 $filename_exception = pathinfo($originalname, PATHINFO_FILENAME);
+                 $error =  $e->getMessage();
+                 Storage::disk('local')->put('failed/'.$filename_exception.'.txt', json_encode($error));
+        }                        
          
-    //            // // Redirigir con un mensaje de éxito
-    //     return redirect()->back()->with('success', 'Datos importados con éxito!');
-    // }
+        // Redirigir con un mensaje de éxito
+        return redirect()->back()->with($tipo, $mensaje);
+    }
 
 
 }

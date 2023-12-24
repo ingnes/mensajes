@@ -13,6 +13,8 @@
   <h3> { request()->all() }  Devuelve todos los datos de un formulario enviado, en formato JSON</h3>
   <h3> { request()->has('nombre') } Si la peticion tiene nombre, es decir si me viene un input con name nombre del formulario enviado por el usuario</h3>
   <h3> { request()->input('nombre') } Accedemos al valor del input con name nombre que me viene del formulario</h3>
+  <h3> { request()->ajax } Pregunta si es o no una peticion ajax</h3>
+
 
 <h2> clase Response : Respuesta del servidor a una solicitud de usuario</h2>
  <p> <b> Si devuelvo un array unidimensional o bidimensional desde la ruta o desde el controlador, Laravel lo convierte automaticamente en un JSON </b></p>

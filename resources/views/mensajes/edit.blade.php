@@ -2,28 +2,27 @@
 
 @section('contenido')
 
-<h2> Edicion de mensaje</h2>
+<h2 class="mt-10 bg-gradient-to-r from-indigo-400 to-green-600 bg-clip-text 
+text-center text-4xl font-extrabold text-transparent sm:text-xl"> Edicion de mensaje</h2>
 
- <form action="{{ route('mensajes.update',$mensaje->id)}}" method="POST">
+ <form action="{{ route('mensajes.update',$mensaje->id)}}" method="POST" class="text-center">
     {!!method_field('PUT')!!}
     {!! csrf_field() !!}
-   <p> <label for="nombre">Nombre
-    <input type="text" name="nombre" value="{{ $mensaje->nombre }}">
-    <span class="error">{{$errors->first('nombre')}}</span>
-    </label> </p>
+      <label class="font-boldr" for="nombre">Nombre </label>
+      <input class="block mx-auto" type="text" name="nombre" value="{{ old('nombre') }}">
+      <span class="error">{{$errors->first('nombre')}}</span>
+      
 
-    <p><label for="email">Email
-    <input type="email" name="email" value="{{ $mensaje->email }}">
-    <span class="error"> {{$errors->first('email') }}</span>
-    </label></p>
-    
+      <label class="font-bold" for="email">Email </label>
+      <input class="block mx-auto" type="email" name="email" value="{{ old('email') }}">
+      <span class="error"> {{$errors->first('email') }}</span>                   
+      
 
-    <p><label for="mensaje">Mensaje
-    <textarea style="resize:none;" name="mensaje" cols="30" rows="5">{{ $mensaje->mensaje }}</textarea>
-    <span class="error">{{$errors->first('mensaje')}}</span>
-    </label></p>
+      <label class="font-bold" for="mensaje">Mensaje</label>
+      <textarea class="block mx-auto" style="resize:none;" name="mensaje" cols="30" rows="5" value="{{ old('mensaje') }}"></textarea>
+      <span class="error">{{$errors->first('mensaje')}}</span>                           
 
-    <input type="submit" value="enviar">
+      <button type="submit" class="mt-5 block rounded bg-blue-500 px-3 py-1 text-white mx-auto">Enviar</button>
  </form>
 
 @endsection
