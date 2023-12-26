@@ -40,16 +40,37 @@ class MessagesController extends Controller
      */
     public function store(Request $request)
     {
+       
+       if (auth()->guest()) {
+
         $this->validate($request, [
             'nombre' => 'required',
             'email' => 'required|email',
             'mensaje' => 'required|min:5|max:250'
         ]);
+
+       } else {
+
+        $this->validate($request, [                    
+            'mensaje' => 'required|min:5|max:250'
+        ]);
+
+
+       }      
+        
        
-       $mensaje = new Message;
-       $mensaje->nombre = $request->nombre;
-       $mensaje->email = $request->email;
-       $mensaje->mensaje = $request->mensaje;
+       $mensaje = new Message;       
+
+       if (auth()->guest()) {
+        $mensaje->nombre = $request->nombre;
+        $mensaje->email = $request->email;
+       } else {
+        $mensaje->nombre = auth()->user()->name;
+        $mensaje->email = auth()->user()->email;
+        $mensaje->user_id = auth()->user()->id;
+       }
+       
+       $mensaje->mensaje = $request->mensaje;       
        $mensaje->save();
 
        return back()->with('info','El mensaje fue enviado exitosamente');
