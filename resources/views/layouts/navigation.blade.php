@@ -23,6 +23,12 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.index')">
+                       Usuarios
+                    </x-nav-link>
+                </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('docu')" :active="request()->routeIs('docu')">
                        Documentacion
                     </x-nav-link>

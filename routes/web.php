@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,7 +26,7 @@ Route::get('test', function() {
     return \App\Models\User::with('mensajes')->get();
 });
 
-Route::resource('users', UsersController::class);
+Route::resource('usuarios', UsersController::class);
 
 Route::get('/', 'App\Http\Controllers\MessagesController@create')->name('home');
 Route::resource('mensajes', MessagesController::class);

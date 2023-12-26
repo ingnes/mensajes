@@ -68,7 +68,7 @@
                                     <span class="error">{{$errors->first('nombre')}}</span>
                                
                                     <label class="font-bold" for="email">Email </label>
-                                    <input class="block mx-auto" type="email" name="email" id="email" value="{{ old('email') }}"/>
+                                    <input class="block mx-auto" autocomplete="true" type="email" name="email" id="email" value="{{ old('email') }}"/>
                                     <span class="error"> {{$errors->first('email') }}</span>
                                 @endif                                
 
