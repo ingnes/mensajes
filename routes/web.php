@@ -20,6 +20,13 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
+Route::get('test', function() {
+
+    return \App\Models\User::with('mensajes')->get();
+});
+
+Route::resource('users', UsersController::class);
+
 Route::get('/', 'App\Http\Controllers\MessagesController@create')->name('home');
 Route::resource('mensajes', MessagesController::class);
 
