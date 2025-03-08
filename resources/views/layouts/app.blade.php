@@ -21,7 +21,7 @@
 
             <!-- Page Heading -->           
                 <header class="bg-white shadow">
-                    <div class="max-w-7xl">
+                    <div class="max-w-7xl mx-2">
                         
                         <div class="text-left">Bienvenido a mensajes 😎✉</div>                        
 
@@ -39,7 +39,9 @@
 
             <!-- Page Content -->
             <main>
-               @yield('contenido')
+               <div class="mx-2">
+                    @yield('contenido')
+                </div>
             </main>
 
             <br>
